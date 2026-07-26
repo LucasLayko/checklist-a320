@@ -73,35 +73,9 @@
         .btn-efb:active { background-color: #30363d; }
         .btn-reset-all { color: #f0883e; border-color: #f0883e; }
 
-        /* BARRE DE RECHERCHE */
-        .search-container {
-            position: fixed;
-            top: 60px;
-            left: 0;
-            right: 0;
-            padding: 12px 20px;
-            background-color: #0d1117;
-            border-bottom: 1px solid #21262d;
-            z-index: 999;
-        }
-        .search-input {
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-            display: block;
-            padding: 12px 16px;
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            color: #00ffff;
-            font-family: monospace;
-            font-size: 15px;
-            border-radius: 6px;
-            outline: none;
-        }
-
         /* CONTENEUR PRINCIPAL */
         .main-content {
-            margin-top: 135px;
+            margin-top: 80px;
             padding: 0 20px 40px 20px;
             max-width: 900px;
             margin-left: auto;
@@ -240,10 +214,6 @@
             <button id="btn-reset-all" class="btn-efb btn-reset-all" onclick="resetAllChecklists()">RESET ALL</button>
         </div>
     </header>
-
-    <div class="search-container" id="search-container">
-        <input type="text" id="search-input" class="search-input" placeholder="Rechercher une procédure (ex: Cockpit Prep, Engine Fire...)" oninput="handleSearch()">
-    </div>
 
     <div class="main-content">
         <div id="view-categories" class="grid-menu"></div>
@@ -541,8 +511,6 @@
 
         function goHome() {
             navigationHistory = [];
-            document.getElementById('search-container').style.display = 'block';
-            document.getElementById('search-input').value = '';
             document.getElementById('view-categories').style.display = 'grid';
             document.getElementById('view-list').style.display = 'none';
             document.getElementById('view-checklist').style.display = 'none';
@@ -569,7 +537,6 @@
             }
 
             const cat = database[catIndex];
-            document.getElementById('search-container').style.display = 'block';
             document.getElementById('view-categories').style.display = 'none';
             document.getElementById('view-list').style.display = 'block';
             document.getElementById('view-checklist').style.display = 'none';
@@ -616,7 +583,6 @@
                 navigationHistory.push({ type: 'category_list', catIndex: catIndex });
             }
 
-            document.getElementById('search-container').style.display = 'none';
             document.getElementById('view-list').style.display = 'none';
             document.getElementById('view-categories').style.display = 'none';
             document.getElementById('view-checklist').style.display = 'block';
@@ -681,44 +647,6 @@
                 });
             });
             alert("Toutes les checklists ont été réinitialisées.");
-        }
-
-        function handleSearch() {
-            const query = document.getElementById('search-input').value.toLowerCase().trim();
-            if (query === '') {
-                goHome();
-                return;
-            }
-
-            document.getElementById('view-categories').style.display = 'none';
-            document.getElementById('view-list').style.display = 'block';
-            document.getElementById('view-checklist').style.display = 'none';
-            document.getElementById('btn-back').style.display = 'block';
-            document.getElementById('btn-reset-all').style.display = 'none';
-
-            const container = document.getElementById('view-list');
-            container.innerHTML = '<div class="list-group-title">RÉSULTATS DE RECHERCHE</div>';
-
-            let matches = 0;
-            database.forEach((cat, catIdx) => {
-                cat.groups.forEach(group => {
-                    group.checklists.forEach(chk => {
-                        if (chk.name.toLowerCase().includes(query)) {
-                            matches++;
-                            container.innerHTML += `
-                                <div class="card-checklist" onclick="loadChecklist('${chk.id}', ${catIdx})">
-                                    <span class="chk-title">${chk.name}</span>
-                                    <span class="chk-count">${cat.tag}</span>
-                                </div>
-                            `;
-                        }
-                    });
-                });
-            });
-
-            if (matches === 0) {
-                container.innerHTML += '<div style="padding: 20px; color: #8b949e; font-family: monospace;">Aucune procédure trouvée</div>';
-            }
         }
 
         goHome();
