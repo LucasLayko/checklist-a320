@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Airbus A320 EFB - eQRH & Normal Checklists</title>
+    <title>Airbus A320 EFB - Normal & Emergency Procedures</title>
     <style>
         * {
             box-sizing: border-box;
@@ -22,7 +22,7 @@
             overflow-x: hidden;
         }
 
-        /* HEADER FIXE EFB AIRBUS NAVBLUE */
+        /* HEADER FIXE EFB AIRBUS */
         header {
             position: fixed;
             top: 0;
@@ -122,9 +122,13 @@
             border-radius: 8px;
             cursor: pointer;
         }
+        .card-category.emergency-cat {
+            border-left-color: #ff4d4d;
+        }
         .card-category:active { background-color: #1c2128; }
         .cat-tag { font-size: 11px; color: #8b949e; font-weight: bold; margin-bottom: 6px; font-family: monospace; }
         .cat-title { font-size: 17px; font-weight: bold; color: #00ffff; font-family: monospace; }
+        .emergency-cat .cat-title { color: #ff4d4d; }
 
         /* VUE 2 : LISTE DES CHECKLISTS */
         .list-group-title {
@@ -163,7 +167,7 @@
             grid-template-columns: auto 1fr auto auto;
             align-items: center;
             gap: 12px;
-            padding: 18px 20px;
+            padding: 16px 20px;
             border-bottom: 1px solid #21262d;
             cursor: pointer;
             background-color: #161b22;
@@ -173,7 +177,7 @@
 
         .challenge {
             color: #00ffff;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             font-family: monospace;
             white-space: nowrap;
@@ -190,7 +194,7 @@
 
         .response {
             color: #ffffff;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             font-family: monospace;
             text-align: right;
@@ -219,6 +223,9 @@
             background-color: rgba(0, 255, 0, 0.15);
             color: #00ff00;
         }
+
+        /* STYLE ROUGE POUR LES PROCÉDURES D'URGENCE */
+        .emergency-mode .challenge { color: #ff4d4d; }
     </style>
 </head>
 <body>
@@ -235,17 +242,12 @@
     </header>
 
     <div class="search-container" id="search-container">
-        <input type="text" id="search-input" class="search-input" placeholder="Rechercher une procédure (ex: Before Start, Engine Fire...)" oninput="handleSearch()">
+        <input type="text" id="search-input" class="search-input" placeholder="Rechercher une procédure (ex: Cockpit Prep, Engine Fire...)" oninput="handleSearch()">
     </div>
 
     <div class="main-content">
-        <!-- VUE 1 : MENU CATÉGORIES -->
         <div id="view-categories" class="grid-menu"></div>
-
-        <!-- VUE 2 : LISTE DES CHECKLISTS -->
         <div id="view-list" style="display:none;"></div>
-
-        <!-- VUE 3 : CHECKLIST DÉTAILLÉE -->
         <div id="view-checklist" style="display:none;"></div>
     </div>
 
@@ -254,113 +256,200 @@
             {
                 id: "normal",
                 tag: "NORMAL PROCEDURES",
-                title: "01. NORMAL CHECKLISTS",
+                title: "01. NORMAL PROCEDURES",
+                isEmergency: false,
                 groups: [
                     {
                         name: "PRE-FLIGHT & START",
                         checklists: [
                             {
-                                id: "c1",
+                                id: "np_cp",
                                 name: "COCKPIT PREPARATION",
                                 items: [
-                                    { c: "GEAR LEVER", r: "DOWN" },
-                                    { c: "PARKING BRAKE", r: "ON" },
-                                    { c: "BATTERIES 1+2", r: "AUTO / 25.5V+" },
-                                    { c: "EXT PWR", r: "ON / AVAIL" },
-                                    { c: "APU BLEED", r: "OFF / AS RQRD" },
-                                    { c: "ADIRS 1+2+3", r: "NAV" },
-                                    { c: "BARO REF", r: "SET / CROSSCHECK" }
+                                    { c: "BATTERIES", r: "ON" },
+                                    { c: "INTERIOR LIGHTS", r: "AS REQUIRED" },
+                                    { c: "CHOCKS/PARKING BRAKE", r: "SET/OFF" },
+                                    { c: "WIPERS", r: "OFF" },
+                                    { c: "ANTI-SKID", r: "ON" },
+                                    { c: "LANDING GEAR LEVER", r: "DOWN" },
+                                    { c: "THRUST LEVERS", r: "IDLE" },
+                                    { c: "ENGINE MASTERS", r: "OFF" },
+                                    { c: "ENGINE MODE SELECTOR", r: "NORMAL" },
+                                    { c: "WEATHER RADAR/PWS", r: "OFF" },
+                                    { c: "SPOILERS", r: "DISARMED & RETRACTED" },
+                                    { c: "FLAPS", r: "ZERO" },
+                                    { c: "TRANSPONDER", r: "STANDBY" },
+                                    { c: "TCAS", r: "STANDBY" },
+                                    { c: "ELECTRICAL POWER", r: "(EXT or APU) ON" },
+                                    { c: "ADIRS", r: "NAV" },
+                                    { c: "GROUND CONTROL", r: "ON" },
+                                    { c: "CREW SUPPLY", r: "ON" },
+                                    { c: "AIR CONDITION", r: "AS REQUIRED" },
+                                    { c: "NAV & LOGO LIGHTS", r: "ON" },
+                                    { c: "NO SMOKING SIGNS", r: "AUTO" },
+                                    { c: "EMERGENCY EXIT LIGHTS", r: "ARMED" },
+                                    { c: "ECAM RECALL/STATUS", r: "CHECKED" },
+                                    { c: "RADIO PANELS", r: "ON" },
+                                    { c: "FIRE TESTS", r: "PERFORMED" },
+                                    { c: "ANNUNCIATOR LIGHTS", r: "TEST" },
+                                    { c: "CIRCUIT BREAKERS", r: "ALL ON" },
+                                    { c: "GEAR PINS/COVERS", r: "REMOVED" }
                                 ]
                             },
                             {
-                                id: "c2",
-                                name: "BEFORE PUSHBACK / START",
+                                id: "np_bs",
+                                name: "BEFORE START",
                                 items: [
-                                    { c: "LOADSHEET", r: "FINAL RECEIVED" },
-                                    { c: "MCDU / PERF", r: "SET & CHECKED" },
-                                    { c: "SEAT BELTS", r: "ON" },
-                                    { c: "DOORS / SLIDES", r: "CLOSED / ARMED" },
-                                    { c: "BEACON LIGHT", r: "ON" },
-                                    { c: "THRUST LEVERS", r: "IDLE" }
+                                    { c: "APU/APU BLEED", r: "ON" },
+                                    { c: "BARO REFERENCE", r: "( )SET" },
+                                    { c: "FUEL QUANTITY", r: "( )KG" },
+                                    { c: "TAKEOFF DATA", r: "SET" },
+                                    { c: "SEATBELT SIGNS", r: "ON" },
+                                    { c: "WINDOWS/DOORS", r: "CLOSED/LOCKED" },
+                                    { c: "GROUND EQUIPMENT", r: "REMOVED" },
+                                    { c: "EXT POWER/GPU", r: "OFF/DISCONNECTED" },
+                                    { c: "FUEL PUMPS", r: "ON" },
+                                    { c: "ACCUMULATOR PRESSURE", r: "CHECKED" },
+                                    { c: "PARKING BRAKE/CHOCKS", r: "ON/REMOVED" },
+                                    { c: "THRUST LEVERS", r: "IDLE" },
+                                    { c: "TRANSPONDER", r: "( )AUTO" },
+                                    { c: "BEACON LIGHTS", r: "ON" }
                                 ]
                             },
                             {
-                                id: "c3",
+                                id: "np_as",
                                 name: "AFTER START",
                                 items: [
-                                    { c: "APU MASTER SW", r: "OFF" },
-                                    { c: "ANTI ICE", r: "AS RQRD" },
-                                    { c: "ECAM STATUS", r: "CHECKED" },
-                                    { c: "PITCH TRIM", r: "__ % SET" },
-                                    { c: "RUDDER TRIM", r: "ZERO" },
-                                    { c: "GROUND SIGNAL", r: "RECEIVED" }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "TAXI & TAKEOFF",
-                        checklists: [
-                            {
-                                id: "c4",
-                                name: "TAXI",
-                                items: [
-                                    { c: "FLAPS", r: "SET FOR T.O" },
-                                    { c: "FLIGHT CONTROLS", r: "CHECKED" },
-                                    { c: "RADAR / PRED WS", r: "ON" },
-                                    { c: "AUTO BRK", r: "MAX" },
-                                    { c: "T.O CONFIG", r: "TESTED" },
-                                    { c: "T.O MEMO", r: "NO BLUE" }
-                                ]
-                            },
-                            {
-                                id: "c5",
-                                name: "BEFORE TAKEOFF",
-                                items: [
-                                    { c: "CABIN REPORT", r: "READY" },
-                                    { c: "TCAS", r: "TA/RA" },
-                                    { c: "APPROACH PATTERN", r: "CLEAR" },
-                                    { c: "ENG MODE SEL", r: "AS RQRD" }
-                                ]
-                            },
-                            {
-                                id: "c6",
-                                name: "AFTER TAKEOFF / CLIMB",
-                                items: [
-                                    { c: "LANDING GEAR", r: "UP" },
-                                    { c: "FLAPS", r: "RETRACTED" },
-                                    { c: "PACKS 1+2", r: "ON" },
-                                    { c: "BARO SETTING", r: "STANDARD (STD)" }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "DESCENT & PARKING",
-                        checklists: [
-                            {
-                                id: "c7",
-                                name: "APPROACH & LANDING",
-                                items: [
-                                    { c: "BARO SETTING", r: "QNH SET" },
-                                    { c: "BRIEFING", r: "CONFIRMED" },
-                                    { c: "ECAM STATUS", r: "CHECKED" },
-                                    { c: "LANDING GEAR", r: "DOWN 3 GREEN" },
-                                    { c: "FLAPS", r: "FULL" },
-                                    { c: "AUTOBRAKE", r: "MED / AS RQRD" },
-                                    { c: "LDG MEMO", r: "NO BLUE" }
-                                ]
-                            },
-                            {
-                                id: "c8",
-                                name: "AFTER LANDING / PARKING",
-                                items: [
-                                    { c: "RADAR / PRED WS", r: "OFF" },
-                                    { c: "APU MASTER SW", r: "ON" },
                                     { c: "PARKING BRAKE", r: "ON" },
-                                    { c: "ENG MASTER 1+2", r: "OFF" },
-                                    { c: "SEAT BELTS", r: "OFF" },
-                                    { c: "FUEL PUMPS", r: "OFF" }
+                                    { c: "ENGINE MODE SELECTOR", r: "NORMAL" },
+                                    { c: "APU BLEED/APU", r: "OFF" },
+                                    { c: "ANTI-ICE", r: "AS REQUIRED" },
+                                    { c: "FLIGHT CONTROLS", r: "CHECKED" },
+                                    { c: "SPOILERS", r: "ARMED" },
+                                    { c: "FLAPS", r: "SET T/O" },
+                                    { c: "RUDDER TRIM", r: "ZERO" },
+                                    { c: "PITCH TRIM", r: "AS REQUIRED" },
+                                    { c: "BRAKES PRESS", r: "CHECK PRESSURE" },
+                                    { c: "ECAM STATUS", r: "CHECKED" },
+                                    { c: "EXTERIOR LIGHTS", r: "AS REQUIRED" }
+                                ]
+                            },
+                            {
+                                id: "np_bto",
+                                name: "BEFORE TAKE OFF",
+                                items: [
+                                    { c: "CABIN", r: "ADVISED" },
+                                    { c: "BRAKE TEMPERATURE/FANS", r: "CHECKED/OFF" },
+                                    { c: "ENGINE MODE SELECTOR", r: "AS REQUIRED" },
+                                    { c: "PACKS", r: "AS REQUIRED" },
+                                    { c: "WEATHER RADAR/PWS", r: "AS REQUIRED/ON" },
+                                    { c: "TCAS", r: "TA/RA & ABV" },
+                                    { c: "AUTO BRAKES", r: "MAX" },
+                                    { c: "EXTERIOR LIGHTS", r: "AS REQUIRED" },
+                                    { c: "STROBE LIGHTS", r: "ON" },
+                                    { c: "T/O CONFIG/ECAM MEMO", r: "T/O NO BLUE" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "CLIMB, DESCENT & LANDING",
+                        checklists: [
+                            {
+                                id: "np_ato",
+                                name: "AFTER TAKE OFF/CLIMB",
+                                items: [
+                                    { c: "EXTERIOR LIGHTS", r: "AS REQUIRED" },
+                                    { c: "LANDING GEAR", r: "UP" },
+                                    { c: "THRUST LEVERS", r: "CLIMB" },
+                                    { c: "ENGINE MODE SELECTOR", r: "NORMAL" },
+                                    { c: "SPOILERS", r: "DISARMED" },
+                                    { c: "FLAPS", r: "ZERO" },
+                                    { c: "PACKS", r: "ON" },
+                                    { c: "ANTI-ICE", r: "AS REQUIRED" },
+                                    { c: "ECAM STATUS", r: "CHECKED" },
+                                    { c: "EXTERIOR LIGHTS", r: "AS REQUIRED" },
+                                    { c: "BARO REFERENCE", r: "STD" },
+                                    { c: "ECAM STATUS", r: "CHECKED" }
+                                ]
+                            },
+                            {
+                                id: "np_da",
+                                name: "DESCENT/APPROACH",
+                                items: [
+                                    { c: "TCAS", r: "BLW" },
+                                    { c: "ON LANDING DATA", r: "SET" },
+                                    { c: "ECAM STATUS", r: "CHECKED" },
+                                    { c: "BARO REFERENCE", r: "( )SET" },
+                                    { c: "EXTERIOR LIGHTS", r: "AS REQUIRED" }
+                                ]
+                            },
+                            {
+                                id: "np_bl",
+                                name: "BEFORE LANDING",
+                                items: [
+                                    { c: "CABIN", r: "ADVISED" },
+                                    { c: "LANDING GEAR", r: "DOWN" },
+                                    { c: "FLAPS", r: "SET LDG" },
+                                    { c: "SPOILERS", r: "ARMED" },
+                                    { c: "AUTO BRAKE", r: "AS REQUIRED" },
+                                    { c: "ENGINE MODE SELECTOR", r: "AS REQUIRED" },
+                                    { c: "EXTERIOR LIGHTS", r: "AS REQUIRED" },
+                                    { c: "GO AROUND ALTITUDE", r: "SET FCU" },
+                                    { c: "ECAM MEMO", r: "LDG NO BLUE" }
+                                ]
+                            },
+                            {
+                                id: "np_al",
+                                name: "AFTER LANDING",
+                                items: [
+                                    { c: "BRAKE FANS", r: "AS REQUIRED" },
+                                    { c: "EXTERIOR LIGHTS", r: "AS REQUIRED" },
+                                    { c: "STROBE LIGHTS", r: "OFF" },
+                                    { c: "ANTI-ICE", r: "OFF" },
+                                    { c: "FLAPS", r: "ZERO" },
+                                    { c: "SPOILERS", r: "DISARMED & RETRACTED" },
+                                    { c: "ENGINE MODE SELECTOR", r: "NORMAL" },
+                                    { c: "WEATHER RADAR/PWS", r: "OFF" },
+                                    { c: "TCAS", r: "STBY" },
+                                    { c: "APU", r: "ON" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "PARKING & SHUTDOWN",
+                        checklists: [
+                            {
+                                id: "np_pk",
+                                name: "PARKING",
+                                items: [
+                                    { c: "EXTERIOR LIGHTS", r: "AS REQUIRED" },
+                                    { c: "BRAKE FANS", r: "OFF" },
+                                    { c: "PARKING BRAKE", r: "ON" },
+                                    { c: "ENGINE MASTERS", r: "OFF" },
+                                    { c: "BEACON", r: "OFF" },
+                                    { c: "FUEL PUMPS", r: "OFF" },
+                                    { c: "SEATBELT SIGNS", r: "OFF" },
+                                    { c: "TRANSPONDER", r: "STBY" },
+                                    { c: "CHOCKS/PARKING BRAKE", r: "SET/OFF" },
+                                    { c: "ELECTRICAL POWER", r: "(EXT or APU) ON" },
+                                    { c: "APU BLEED", r: "AS REQUIRED" }
+                                ]
+                            },
+                            {
+                                id: "np_sd",
+                                name: "SHUTDOWN",
+                                items: [
+                                    { c: "ADIRS", r: "OFF" },
+                                    { c: "CREW SUPPLY", r: "OFF" },
+                                    { c: "NAV & LOGO LIGHTS", r: "OFF" },
+                                    { c: "NO SMOKING SIGNS", r: "OFF" },
+                                    { c: "EMERGENCY EXIT LIGHTS", r: "OFF" },
+                                    { c: "APU BLEED/APU", r: "OFF" },
+                                    { c: "EXTERNAL POWER/GPU", r: "OFF/DISCONNECTED" },
+                                    { c: "INTERIOR LIGHTS", r: "OFF" },
+                                    { c: "BATTERIES", r: "OFF" }
                                 ]
                             }
                         ]
@@ -368,32 +457,76 @@
                 ]
             },
             {
-                id: "abnormal",
-                tag: "eQRH PROCEDURES",
-                title: "02. ABNORMAL & EMERGENCY",
+                id: "emergency",
+                tag: "EMERGENCY & eQRH",
+                title: "02. EMERGENCY PROCEDURES",
+                isEmergency: true,
                 groups: [
                     {
-                        name: "ENGINES & CABIN",
+                        name: "ENGINE & FIRE PROCEDURES",
                         checklists: [
                             {
-                                id: "e1",
-                                name: "ENG 1/2 FIRE IN FLIGHT",
+                                id: "em_eng_fire",
+                                name: "ENG 1(2) FIRE IN FLIGHT",
                                 items: [
-                                    { c: "THRUST LEVER", r: "IDLE" },
-                                    { c: "ENG MASTER SW", r: "OFF" },
-                                    { c: "ENG FIRE BUTTON", r: "PUSHED" },
-                                    { c: "AGENT 1", r: "DISCHARGE" },
-                                    { c: "ATC", r: "MAYDAY NOTIFIED" }
+                                    { c: "THRUST LEVER (AFFECTED)", r: "IDLE" },
+                                    { c: "ENG MASTER (AFFECTED)", r: "OFF" },
+                                    { c: "ENG FIRE BUTTON", r: "PUSH" },
+                                    { c: "AGENT 1 (AFTER 10s)", r: "DISCHARGE" },
+                                    { c: "AGENT 2 (IF FIRE PERSISTS 30s)", r: "DISCHARGE" },
+                                    { c: "ATC", r: "MAYDAY NOTIFY" }
                                 ]
                             },
                             {
-                                id: "e2",
+                                id: "em_apu_fire",
+                                name: "APU FIRE IN FLIGHT / ON GND",
+                                items: [
+                                    { c: "APU FIRE BUTTON", r: "PUSH" },
+                                    { c: "APU AGENT", r: "DISCHARGE" }
+                                ]
+                            },
+                            {
+                                id: "em_dual_eng_fail",
+                                name: "ENG DUAL FAILURE",
+                                items: [
+                                    { c: "OPTIMUM SPEED", r: "300 KT / GREEN DOT" },
+                                    { c: "ENG MASTERS", r: "OFF / ON" },
+                                    { c: "APU MASTER", r: "ON" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "CABIN & AIRFRAME EMERGENCIES",
+                        checklists: [
+                            {
+                                id: "em_emg_descent",
                                 name: "EMERGENCY DESCENT",
                                 items: [
                                     { c: "CREW OXY MASKS", r: "ON / 100%" },
-                                    { c: "DESCENT", r: "INITIATE (FL100/MEA)" },
+                                    { c: "DESCENT", r: "INITIATE (FL100 / MEA)" },
                                     { c: "THRUST LEVERS", r: "IDLE" },
                                     { c: "SPEED BRAKES", r: "FULL" }
+                                ]
+                            },
+                            {
+                                id: "em_smoke",
+                                name: "SMOKE / ELEC SMOKE",
+                                items: [
+                                    { c: "OXY MASKS", r: "ON / 100% / EMER" },
+                                    { c: "CREW COMM", r: "ESTABLISH" },
+                                    { c: "ELEC PARTIAL VENTILATION", r: "INITIATE" }
+                                ]
+                            },
+                            {
+                                id: "em_loss_brk",
+                                name: "LOSS OF BRAKING",
+                                items: [
+                                    { c: "REV LEVERS", r: "MAX" },
+                                    { c: "BRAKE PEDALS", r: "RELEASE" },
+                                    { c: "A/SKID & N/W STRG", r: "OFF" },
+                                    { c: "BRAKE PEDALS", r: "PRESS MAX 1000 PSI" },
+                                    { c: "PARK BRAKE (IF STILL NO BRK)", r: "USE SHORT STROKES" }
                                 ]
                             }
                         ]
@@ -402,7 +535,6 @@
             }
         ];
 
-        // GESTION DE L'HISTORIQUE DE NAVIGATION
         let navigationHistory = [];
         let currentActiveChecklist = null;
 
@@ -420,8 +552,9 @@
             const container = document.getElementById('view-categories');
             container.innerHTML = '';
             database.forEach((cat, index) => {
+                const isEmg = cat.isEmergency ? 'emergency-cat' : '';
                 container.innerHTML += `
-                    <div class="card-category" onclick="openCategory(${index})">
+                    <div class="card-category ${isEmg}" onclick="openCategory(${index})">
                         <div class="cat-tag">${cat.tag}</div>
                         <div class="cat-title">${cat.title}</div>
                     </div>
@@ -462,10 +595,14 @@
 
         function loadChecklist(chkId, catIndex, isBack = false) {
             let foundChk = null;
+            let parentCat = null;
             database.forEach(cat => {
                 cat.groups.forEach(group => {
                     group.checklists.forEach(chk => {
-                        if (chk.id === chkId) foundChk = chk;
+                        if (chk.id === chkId) {
+                            foundChk = chk;
+                            parentCat = cat;
+                        }
                     });
                 });
             });
@@ -485,7 +622,7 @@
             document.getElementById('btn-back').style.display = 'block';
             document.getElementById('header-title').innerText = foundChk.name;
 
-            renderChecklistRows();
+            renderChecklistRows(parentCat && parentCat.isEmergency);
         }
 
         function goBack() {
@@ -505,19 +642,19 @@
             }
         }
 
-        function renderChecklistRows() {
+        function renderChecklistRows(isEmergency = false) {
             const container = document.getElementById('view-checklist');
             container.innerHTML = '';
 
             const card = document.createElement('div');
-            card.className = 'checklist-card';
+            card.className = `checklist-card ${isEmergency ? 'emergency-mode' : ''}`;
 
             currentActiveChecklist.items.forEach((item) => {
                 const row = document.createElement('div');
                 row.className = `item-row ${item.checked ? 'checked' : ''}`;
                 row.onclick = () => {
                     item.checked = !item.checked;
-                    renderChecklistRows();
+                    renderChecklistRows(isEmergency);
                 };
                 row.innerHTML = `
                     <span class="challenge">${item.c}</span>
