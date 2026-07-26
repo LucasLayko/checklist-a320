@@ -71,7 +71,7 @@
             cursor: pointer;
         }
         .btn-efb:active { background-color: #30363d; }
-        .btn-reset { color: #f0883e; border-color: #f0883e; }
+        .btn-reset-all { color: #f0883e; border-color: #f0883e; }
 
         /* BARRE DE RECHERCHE */
         .search-container {
@@ -237,7 +237,7 @@
         </div>
         <div class="header-right">
             <button id="btn-back" class="btn-efb" onclick="goBack()" style="display:none;">&lt; BACK</button>
-            <button id="btn-reset" class="btn-efb btn-reset" onclick="resetCurrentChecklist()" style="display:none;">RESET</button>
+            <button id="btn-reset-all" class="btn-efb btn-reset-all" onclick="resetAllChecklists()">RESET ALL</button>
         </div>
     </header>
 
@@ -537,6 +537,7 @@
 
         let navigationHistory = [];
         let currentActiveChecklist = null;
+        let isCurrentEmergency = false;
 
         function goHome() {
             navigationHistory = [];
@@ -546,7 +547,7 @@
             document.getElementById('view-list').style.display = 'none';
             document.getElementById('view-checklist').style.display = 'none';
             document.getElementById('btn-back').style.display = 'none';
-            document.getElementById('btn-reset').style.display = 'none';
+            document.getElementById('btn-reset-all').style.display = 'block';
             document.getElementById('header-title').innerText = "A320 NORMAL & eQRH";
 
             const container = document.getElementById('view-categories');
@@ -573,7 +574,7 @@
             document.getElementById('view-list').style.display = 'block';
             document.getElementById('view-checklist').style.display = 'none';
             document.getElementById('btn-back').style.display = 'block';
-            document.getElementById('btn-reset').style.display = 'none';
+            document.getElementById('btn-reset-all').style.display = 'none';
             document.getElementById('header-title').innerText = cat.title;
 
             const container = document.getElementById('view-list');
@@ -609,6 +610,7 @@
 
             if (!foundChk) return;
             currentActiveChecklist = foundChk;
+            isCurrentEmergency = parentCat && parentCat.isEmergency;
 
             if (!isBack) {
                 navigationHistory.push({ type: 'category_list', catIndex: catIndex });
@@ -618,11 +620,11 @@
             document.getElementById('view-list').style.display = 'none';
             document.getElementById('view-categories').style.display = 'none';
             document.getElementById('view-checklist').style.display = 'block';
-            document.getElementById('btn-reset').style.display = 'block';
+            document.getElementById('btn-reset-all').style.display = 'none';
             document.getElementById('btn-back').style.display = 'block';
             document.getElementById('header-title').innerText = foundChk.name;
 
-            renderChecklistRows(parentCat && parentCat.isEmergency);
+            renderChecklistRows();
         }
 
         function goBack() {
@@ -642,19 +644,19 @@
             }
         }
 
-        function renderChecklistRows(isEmergency = false) {
+        function renderChecklistRows() {
             const container = document.getElementById('view-checklist');
             container.innerHTML = '';
 
             const card = document.createElement('div');
-            card.className = `checklist-card ${isEmergency ? 'emergency-mode' : ''}`;
+            card.className = `checklist-card ${isCurrentEmergency ? 'emergency-mode' : ''}`;
 
             currentActiveChecklist.items.forEach((item) => {
                 const row = document.createElement('div');
                 row.className = `item-row ${item.checked ? 'checked' : ''}`;
                 row.onclick = () => {
                     item.checked = !item.checked;
-                    renderChecklistRows(isEmergency);
+                    renderChecklistRows();
                 };
                 row.innerHTML = `
                     <span class="challenge">${item.c}</span>
@@ -668,11 +670,17 @@
             container.appendChild(card);
         }
 
-        function resetCurrentChecklist() {
-            if (currentActiveChecklist) {
-                currentActiveChecklist.items.forEach(item => item.checked = false);
-                renderChecklistRows();
-            }
+        function resetAllChecklists() {
+            database.forEach(cat => {
+                cat.groups.forEach(group => {
+                    group.checklists.forEach(chk => {
+                        chk.items.forEach(item => {
+                            item.checked = false;
+                        });
+                    });
+                });
+            });
+            alert("Toutes les checklists ont été réinitialisées.");
         }
 
         function handleSearch() {
@@ -686,6 +694,7 @@
             document.getElementById('view-list').style.display = 'block';
             document.getElementById('view-checklist').style.display = 'none';
             document.getElementById('btn-back').style.display = 'block';
+            document.getElementById('btn-reset-all').style.display = 'none';
 
             const container = document.getElementById('view-list');
             container.innerHTML = '<div class="list-group-title">RÉSULTATS DE RECHERCHE</div>';
