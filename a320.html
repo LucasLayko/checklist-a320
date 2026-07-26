@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Airbus A320 EFB - eQRH & Normal Checklists</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #0b0e14;
+            color: #d0d7de;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
+
+        /* HEADER FIXE EFB AIRBUS NAVBLUE */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: #161b22;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #30363d;
+            z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .app-logo {
+            background: #00ffff;
+            color: #000000;
+            font-weight: 900;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            letter-spacing: 1px;
+            font-family: monospace;
+        }
+        .header-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #8b949e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 50vw;
+            font-family: monospace;
+        }
+        .header-right { display: flex; gap: 10px; }
+        .btn-efb {
+            background-color: #21262d;
+            color: #58a6ff;
+            border: 1px solid #30363d;
+            padding: 8px 16px;
+            font-family: monospace;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-efb:active { background-color: #30363d; }
+        .btn-reset { color: #f0883e; border-color: #f0883e; }
+
+        /* BARRE DE RECHERCHE */
+        .search-container {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            padding: 12px 20px;
+            background-color: #0d1117;
+            border-bottom: 1px solid #21262d;
+            z-index: 999;
+        }
+        .search-input {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            display: block;
+            padding: 12px 16px;
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            color: #00ffff;
+            font-family: monospace;
+            font-size: 15px;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        /* CONTENEUR PRINCIPAL */
+        .main-content {
+            margin-top: 135px;
+            padding: 0 20px 40px 20px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* VUE 1 : MENU CATÉGORIES */
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .card-category {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-left: 5px solid #00ffff;
+            padding: 22px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .card-category:active { background-color: #1c2128; }
+        .cat-tag { font-size: 11px; color: #8b949e; font-weight: bold; margin-bottom: 6px; font-family: monospace; }
+        .cat-title { font-size: 17px; font-weight: bold; color: #00ffff; font-family: monospace; }
+
+        /* VUE 2 : LISTE DES CHECKLISTS */
+        .list-group-title {
+            color: #8b949e;
+            font-size: 13px;
+            font-weight: bold;
+            margin: 24px 0 10px 0;
+            border-bottom: 1px solid #21262d;
+            padding-bottom: 6px;
+            font-family: monospace;
+        }
+        .card-checklist {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            padding: 18px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .card-checklist:active { background-color: #21262d; }
+        .chk-title { font-size: 16px; font-weight: bold; color: #e6edf3; font-family: monospace; }
+        .chk-count { font-size: 12px; color: #8b949e; font-family: monospace; }
+
+        /* VUE 3 : CHECKLIST INTERACTIVE */
+        .checklist-card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .item-row {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 20px;
+            border-bottom: 1px solid #21262d;
+            cursor: pointer;
+            background-color: #161b22;
+        }
+        .item-row:last-child { border-bottom: none; }
+        .item-row:active { background-color: #1c2128; }
+
+        .challenge {
+            color: #00ffff;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: monospace;
+            white-space: nowrap;
+        }
+
+        .dots-wrapper {
+            overflow: hidden;
+            white-space: nowrap;
+            color: #30363d;
+            font-family: monospace;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
+        .response {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: monospace;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .checkbox-box {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #484f58;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: transparent;
+            margin-left: 8px;
+        }
+
+        .item-row.checked .challenge,
+        .item-row.checked .response {
+            color: #00ff00 !important;
+        }
+        .item-row.checked .checkbox-box {
+            border-color: #00ff00;
+            background-color: rgba(0, 255, 0, 0.15);
+            color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <span class="app-logo">FLYSMART</span>
+            <span id="header-title" class="header-title">A320 NORMAL & eQRH</span>
+        </div>
+        <div class="header-right">
+            <button id="btn-back" class="btn-efb" onclick="goBack()" style="display:none;">&lt; BACK</button>
+            <button id="btn-reset" class="btn-efb btn-reset" onclick="resetCurrentChecklist()" style="display:none;">RESET</button>
+        </div>
+    </header>
+
+    <div class="search-container" id="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Rechercher une procédure (ex: Before Start, Engine Fire...)" oninput="handleSearch()">
+    </div>
+
+    <div class="main-content">
+        <!-- VUE 1 : MENU CATÉGORIES -->
+        <div id="view-categories" class="grid-menu"></div>
+
+        <!-- VUE 2 : LISTE DES CHECKLISTS -->
+        <div id="view-list" style="display:none;"></div>
+
+        <!-- VUE 3 : CHECKLIST DÉTAILLÉE -->
+        <div id="view-checklist" style="display:none;"></div>
+    </div>
+
+    <script>
+        const database = [
+            {
+                id: "normal",
+                tag: "NORMAL PROCEDURES",
+                title: "01. NORMAL CHECKLISTS",
+                groups: [
+                    {
+                        name: "PRE-FLIGHT & START",
+                        checklists: [
+                            {
+                                id: "c1",
+                                name: "COCKPIT PREPARATION",
+                                items: [
+                                    { c: "GEAR LEVER", r: "DOWN" },
+                                    { c: "PARKING BRAKE", r: "ON" },
+                                    { c: "BATTERIES 1+2", r: "AUTO / 25.5V+" },
+                                    { c: "EXT PWR", r: "ON / AVAIL" },
+                                    { c: "APU BLEED", r: "OFF / AS RQRD" },
+                                    { c: "ADIRS 1+2+3", r: "NAV" },
+                                    { c: "BARO REF", r: "SET / CROSSCHECK" }
+                                ]
+                            },
+                            {
+                                id: "c2",
+                                name: "BEFORE PUSHBACK / START",
+                                items: [
+                                    { c: "LOADSHEET", r: "FINAL RECEIVED" },
+                                    { c: "MCDU / PERF", r: "SET & CHECKED" },
+                                    { c: "SEAT BELTS", r: "ON" },
+                                    { c: "DOORS / SLIDES", r: "CLOSED / ARMED" },
+                                    { c: "BEACON LIGHT", r: "ON" },
+                                    { c: "THRUST LEVERS", r: "IDLE" }
+                                ]
+                            },
+                            {
+                                id: "c3",
+                                name: "AFTER START",
+                                items: [
+                                    { c: "APU MASTER SW", r: "OFF" },
+                                    { c: "ANTI ICE", r: "AS RQRD" },
+                                    { c: "ECAM STATUS", r: "CHECKED" },
+                                    { c: "PITCH TRIM", r: "__ % SET" },
+                                    { c: "RUDDER TRIM", r: "ZERO" },
+                                    { c: "GROUND SIGNAL", r: "RECEIVED" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "TAXI & TAKEOFF",
+                        checklists: [
+                            {
+                                id: "c4",
+                                name: "TAXI",
+                                items: [
+                                    { c: "FLAPS", r: "SET FOR T.O" },
+                                    { c: "FLIGHT CONTROLS", r: "CHECKED" },
+                                    { c: "RADAR / PRED WS", r: "ON" },
+                                    { c: "AUTO BRK", r: "MAX" },
+                                    { c: "T.O CONFIG", r: "TESTED" },
+                                    { c: "T.O MEMO", r: "NO BLUE" }
+                                ]
+                            },
+                            {
+                                id: "c5",
+                                name: "BEFORE TAKEOFF",
+                                items: [
+                                    { c: "CABIN REPORT", r: "READY" },
+                                    { c: "TCAS", r: "TA/RA" },
+                                    { c: "APPROACH PATTERN", r: "CLEAR" },
+                                    { c: "ENG MODE SEL", r: "AS RQRD" }
+                                ]
+                            },
+                            {
+                                id: "c6",
+                                name: "AFTER TAKEOFF / CLIMB",
+                                items: [
+                                    { c: "LANDING GEAR", r: "UP" },
+                                    { c: "FLAPS", r: "RETRACTED" },
+                                    { c: "PACKS 1+2", r: "ON" },
+                                    { c: "BARO SETTING", r: "STANDARD (STD)" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "DESCENT & PARKING",
+                        checklists: [
+                            {
+                                id: "c7",
+                                name: "APPROACH & LANDING",
+                                items: [
+                                    { c: "BARO SETTING", r: "QNH SET" },
+                                    { c: "BRIEFING", r: "CONFIRMED" },
+                                    { c: "ECAM STATUS", r: "CHECKED" },
+                                    { c: "LANDING GEAR", r: "DOWN 3 GREEN" },
+                                    { c: "FLAPS", r: "FULL" },
+                                    { c: "AUTOBRAKE", r: "MED / AS RQRD" },
+                                    { c: "LDG MEMO", r: "NO BLUE" }
+                                ]
+                            },
+                            {
+                                id: "c8",
+                                name: "AFTER LANDING / PARKING",
+                                items: [
+                                    { c: "RADAR / PRED WS", r: "OFF" },
+                                    { c: "APU MASTER SW", r: "ON" },
+                                    { c: "PARKING BRAKE", r: "ON" },
+                                    { c: "ENG MASTER 1+2", r: "OFF" },
+                                    { c: "SEAT BELTS", r: "OFF" },
+                                    { c: "FUEL PUMPS", r: "OFF" }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "abnormal",
+                tag: "eQRH PROCEDURES",
+                title: "02. ABNORMAL & EMERGENCY",
+                groups: [
+                    {
+                        name: "ENGINES & CABIN",
+                        checklists: [
+                            {
+                                id: "e1",
+                                name: "ENG 1/2 FIRE IN FLIGHT",
+                                items: [
+                                    { c: "THRUST LEVER", r: "IDLE" },
+                                    { c: "ENG MASTER SW", r: "OFF" },
+                                    { c: "ENG FIRE BUTTON", r: "PUSHED" },
+                                    { c: "AGENT 1", r: "DISCHARGE" },
+                                    { c: "ATC", r: "MAYDAY NOTIFIED" }
+                                ]
+                            },
+                            {
+                                id: "e2",
+                                name: "EMERGENCY DESCENT",
+                                items: [
+                                    { c: "CREW OXY MASKS", r: "ON / 100%" },
+                                    { c: "DESCENT", r: "INITIATE (FL100/MEA)" },
+                                    { c: "THRUST LEVERS", r: "IDLE" },
+                                    { c: "SPEED BRAKES", r: "FULL" }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // GESTION DE L'HISTORIQUE DE NAVIGATION
+        let navigationHistory = [];
+        let currentActiveChecklist = null;
+
+        function goHome() {
+            navigationHistory = [];
+            document.getElementById('search-container').style.display = 'block';
+            document.getElementById('search-input').value = '';
+            document.getElementById('view-categories').style.display = 'grid';
+            document.getElementById('view-list').style.display = 'none';
+            document.getElementById('view-checklist').style.display = 'none';
+            document.getElementById('btn-back').style.display = 'none';
+            document.getElementById('btn-reset').style.display = 'none';
+            document.getElementById('header-title').innerText = "A320 NORMAL & eQRH";
+
+            const container = document.getElementById('view-categories');
+            container.innerHTML = '';
+            database.forEach((cat, index) => {
+                container.innerHTML += `
+                    <div class="card-category" onclick="openCategory(${index})">
+                        <div class="cat-tag">${cat.tag}</div>
+                        <div class="cat-title">${cat.title}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function openCategory(catIndex, isBack = false) {
+            if (!isBack) {
+                navigationHistory.push({ type: 'categories' });
+            }
+
+            const cat = database[catIndex];
+            document.getElementById('search-container').style.display = 'block';
+            document.getElementById('view-categories').style.display = 'none';
+            document.getElementById('view-list').style.display = 'block';
+            document.getElementById('view-checklist').style.display = 'none';
+            document.getElementById('btn-back').style.display = 'block';
+            document.getElementById('btn-reset').style.display = 'none';
+            document.getElementById('header-title').innerText = cat.title;
+
+            const container = document.getElementById('view-list');
+            container.innerHTML = '';
+
+            cat.groups.forEach(group => {
+                let html = `<div class="list-group-title">${group.name}</div>`;
+                group.checklists.forEach(chk => {
+                    html += `
+                        <div class="card-checklist" onclick="loadChecklist('${chk.id}', ${catIndex})">
+                            <span class="chk-title">${chk.name}</span>
+                            <span class="chk-count">${chk.items.length} ITEMS</span>
+                        </div>
+                    `;
+                });
+                container.innerHTML += html;
+            });
+        }
+
+        function loadChecklist(chkId, catIndex, isBack = false) {
+            let foundChk = null;
+            database.forEach(cat => {
+                cat.groups.forEach(group => {
+                    group.checklists.forEach(chk => {
+                        if (chk.id === chkId) foundChk = chk;
+                    });
+                });
+            });
+
+            if (!foundChk) return;
+            currentActiveChecklist = foundChk;
+
+            if (!isBack) {
+                navigationHistory.push({ type: 'category_list', catIndex: catIndex });
+            }
+
+            document.getElementById('search-container').style.display = 'none';
+            document.getElementById('view-list').style.display = 'none';
+            document.getElementById('view-categories').style.display = 'none';
+            document.getElementById('view-checklist').style.display = 'block';
+            document.getElementById('btn-reset').style.display = 'block';
+            document.getElementById('btn-back').style.display = 'block';
+            document.getElementById('header-title').innerText = foundChk.name;
+
+            renderChecklistRows();
+        }
+
+        function goBack() {
+            if (navigationHistory.length === 0) {
+                goHome();
+                return;
+            }
+
+            const lastState = navigationHistory.pop();
+
+            if (lastState.type === 'categories') {
+                goHome();
+            } else if (lastState.type === 'category_list') {
+                openCategory(lastState.catIndex, true);
+            } else {
+                goHome();
+            }
+        }
+
+        function renderChecklistRows() {
+            const container = document.getElementById('view-checklist');
+            container.innerHTML = '';
+
+            const card = document.createElement('div');
+            card.className = 'checklist-card';
+
+            currentActiveChecklist.items.forEach((item) => {
+                const row = document.createElement('div');
+                row.className = `item-row ${item.checked ? 'checked' : ''}`;
+                row.onclick = () => {
+                    item.checked = !item.checked;
+                    renderChecklistRows();
+                };
+                row.innerHTML = `
+                    <span class="challenge">${item.c}</span>
+                    <div class="dots-wrapper">....................................................................</div>
+                    <span class="response">${item.r}</span>
+                    <div class="checkbox-box">${item.checked ? '✔' : ''}</div>
+                `;
+                card.appendChild(row);
+            });
+
+            container.appendChild(card);
+        }
+
+        function resetCurrentChecklist() {
+            if (currentActiveChecklist) {
+                currentActiveChecklist.items.forEach(item => item.checked = false);
+                renderChecklistRows();
+            }
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            if (query === '') {
+                goHome();
+                return;
+            }
+
+            document.getElementById('view-categories').style.display = 'none';
+            document.getElementById('view-list').style.display = 'block';
+            document.getElementById('view-checklist').style.display = 'none';
+            document.getElementById('btn-back').style.display = 'block';
+
+            const container = document.getElementById('view-list');
+            container.innerHTML = '<div class="list-group-title">RÉSULTATS DE RECHERCHE</div>';
+
+            let matches = 0;
+            database.forEach((cat, catIdx) => {
+                cat.groups.forEach(group => {
+                    group.checklists.forEach(chk => {
+                        if (chk.name.toLowerCase().includes(query)) {
+                            matches++;
+                            container.innerHTML += `
+                                <div class="card-checklist" onclick="loadChecklist('${chk.id}', ${catIdx})">
+                                    <span class="chk-title">${chk.name}</span>
+                                    <span class="chk-count">${cat.tag}</span>
+                                </div>
+                            `;
+                        }
+                    });
+                });
+            });
+
+            if (matches === 0) {
+                container.innerHTML += '<div style="padding: 20px; color: #8b949e; font-family: monospace;">Aucune procédure trouvée</div>';
+            }
+        }
+
+        goHome();
+    </script>
+</body>
+</html>
