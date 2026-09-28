@@ -7,198 +7,89 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Airbus A320 EFB - Normal & Emergency Procedures</title>
     <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            background-color: #0b0e14;
-            color: #d0d7de;
+            background-color: #0b0e14; color: #d0d7de;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-user-select: none;
-            overflow-x: hidden;
+            margin: 0; padding: 0; user-select: none; -webkit-user-select: none; overflow-x: hidden;
         }
-
-        /* HEADER FIXE EFB AIRBUS */
         header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background-color: #161b22;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #30363d;
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; right: 0; height: 60px;
+            background-color: #161b22; padding: 0 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #30363d; z-index: 1000;
         }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .app-logo {
-            background: #00ffff;
-            color: #000000;
-            font-weight: 900;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 13px;
-            letter-spacing: 1px;
-            font-family: monospace;
+            background: #00ffff; color: #000000; font-weight: 900; padding: 5px 10px;
+            border-radius: 4px; font-size: 13px; letter-spacing: 1px; font-family: monospace;
         }
         .header-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #8b949e;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 50vw;
-            font-family: monospace;
+            font-size: 16px; font-weight: 700; color: #8b949e; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis; max-width: 50vw; font-family: monospace;
         }
         .header-right { display: flex; gap: 10px; }
         .btn-efb {
-            background-color: #21262d;
-            color: #58a6ff;
-            border: 1px solid #30363d;
-            padding: 8px 16px;
-            font-family: monospace;
-            font-size: 13px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
+            background-color: #21262d; color: #58a6ff; border: 1px solid #30363d;
+            padding: 8px 16px; font-family: monospace; font-size: 13px; font-weight: bold;
+            border-radius: 6px; cursor: pointer;
         }
         .btn-efb:active { background-color: #30363d; }
         .btn-reset-all { color: #f0883e; border-color: #f0883e; }
 
-        /* CONTENEUR PRINCIPAL */
         .main-content {
-            margin-top: 80px;
-            padding: 0 20px 40px 20px;
-            max-width: 900px;
-            margin-left: auto;
-            margin-right: auto;
+            margin-top: 80px; padding: 0 20px 40px 20px; max-width: 900px;
+            margin-left: auto; margin-right: auto;
         }
-
-        /* VUE 1 : MENU CATÉGORIES */
-        .grid-menu {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
-        }
+        .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
         .card-category {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            border-left: 5px solid #00ffff;
-            padding: 22px;
-            border-radius: 8px;
-            cursor: pointer;
+            background-color: #161b22; border: 1px solid #30363d; border-left: 5px solid #00ffff;
+            padding: 22px; border-radius: 8px; cursor: pointer;
         }
-        .card-category.emergency-cat {
-            border-left-color: #ff4d4d;
-        }
+        .card-category.emergency-cat { border-left-color: #ff4d4d; }
         .card-category:active { background-color: #1c2128; }
         .cat-tag { font-size: 11px; color: #8b949e; font-weight: bold; margin-bottom: 6px; font-family: monospace; }
         .cat-title { font-size: 17px; font-weight: bold; color: #00ffff; font-family: monospace; }
         .emergency-cat .cat-title { color: #ff4d4d; }
 
-        /* VUE 2 : LISTE DES CHECKLISTS */
         .list-group-title {
-            color: #8b949e;
-            font-size: 13px;
-            font-weight: bold;
-            margin: 24px 0 10px 0;
-            border-bottom: 1px solid #21262d;
-            padding-bottom: 6px;
-            font-family: monospace;
+            color: #8b949e; font-size: 13px; font-weight: bold; margin: 24px 0 10px 0;
+            border-bottom: 1px solid #21262d; padding-bottom: 6px; font-family: monospace;
         }
         .card-checklist {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            padding: 18px 20px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
+            background-color: #161b22; border: 1px solid #30363d; padding: 18px 20px;
+            margin-bottom: 10px; border-radius: 8px; display: flex;
+            justify-content: space-between; align-items: center; cursor: pointer;
         }
         .card-checklist:active { background-color: #21262d; }
         .chk-title { font-size: 16px; font-weight: bold; color: #e6edf3; font-family: monospace; }
         .chk-count { font-size: 12px; color: #8b949e; font-family: monospace; }
 
-        /* VUE 3 : CHECKLIST INTERACTIVE */
-        .checklist-card {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            overflow: hidden;
-        }
+        .checklist-card { background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; overflow: hidden; }
         .item-row {
-            display: grid;
-            grid-template-columns: auto 1fr auto auto;
-            align-items: center;
-            gap: 12px;
-            padding: 16px 20px;
-            border-bottom: 1px solid #21262d;
-            cursor: pointer;
-            background-color: #161b22;
+            display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 12px;
+            padding: 16px 20px; border-bottom: 1px solid #21262d; cursor: pointer; background-color: #161b22;
         }
         .item-row:last-child { border-bottom: none; }
         .item-row:active { background-color: #1c2128; }
-
-        .challenge {
-            color: #00ffff;
-            font-size: 15px;
-            font-weight: bold;
-            font-family: monospace;
-            white-space: nowrap;
-        }
-
+        .challenge { color: #00ffff; font-size: 15px; font-weight: bold; font-family: monospace; white-space: nowrap; }
         .dots-wrapper {
-            overflow: hidden;
-            white-space: nowrap;
-            color: #30363d;
-            font-family: monospace;
-            font-size: 14px;
-            letter-spacing: 2px;
+            overflow: hidden; white-space: nowrap; color: #30363d; font-family: monospace;
+            font-size: 14px; letter-spacing: 2px;
         }
-
         .response {
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: bold;
-            font-family: monospace;
-            text-align: right;
-            white-space: nowrap;
+            color: #ffffff; font-size: 15px; font-weight: bold; font-family: monospace;
+            text-align: right; white-space: nowrap;
         }
-
         .checkbox-box {
-            width: 28px;
-            height: 28px;
-            border: 2px solid #484f58;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            color: transparent;
-            margin-left: 8px;
+            width: 28px; height: 28px; border: 2px solid #484f58; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center; font-size: 16px;
+            color: transparent; margin-left: 8px;
         }
-
-        .item-row.checked .challenge,
-        .item-row.checked .response {
-            color: #00ff00 !important;
-        }
+        .item-row.checked .challenge, .item-row.checked .response { color: #00ff00 !important; }
         .item-row.checked .checkbox-box {
-            border-color: #00ff00;
-            background-color: rgba(0, 255, 0, 0.15);
-            color: #00ff00;
+            border-color: #00ff00; background-color: rgba(0, 255, 0, 0.15); color: #00ff00;
         }
-
-        /* STYLE ROUGE POUR LES PROCÉDURES D'URGENCE */
         .emergency-mode .challenge { color: #ff4d4d; }
     </style>
 </head>
@@ -504,12 +395,56 @@
             }
         ];
 
+        // ============================================================
+        // SAUVEGARDE (localStorage) : coches + écran courant
+        // ============================================================
+        const STORAGE_KEY = 'a320_efb_state_v1';
+
         let navigationHistory = [];
         let currentActiveChecklist = null;
         let isCurrentEmergency = false;
+        // Vue courante : { view: 'home' | 'list' | 'checklist', catIndex, chkId }
+        let currentView = { view: 'home' };
 
+        function saveState() {
+            try {
+                const checks = {};
+                database.forEach(cat => cat.groups.forEach(group => group.checklists.forEach(chk => {
+                    const arr = chk.items.map(it => !!it.checked);
+                    if (arr.some(Boolean)) checks[chk.id] = arr;
+                })));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({ checks, currentView }));
+            } catch (e) { /* stockage indisponible : on ignore */ }
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return null;
+                const state = JSON.parse(raw);
+                const checks = state.checks || {};
+                database.forEach(cat => cat.groups.forEach(group => group.checklists.forEach(chk => {
+                    const arr = checks[chk.id];
+                    if (Array.isArray(arr)) {
+                        chk.items.forEach((it, i) => { it.checked = !!arr[i]; });
+                    }
+                })));
+                return state.currentView || null;
+            } catch (e) { return null; }
+        }
+
+        // Sécurité supplémentaire : sauvegarde quand l'app passe en arrière-plan
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') saveState();
+        });
+        window.addEventListener('pagehide', saveState);
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
         function goHome() {
             navigationHistory = [];
+            currentView = { view: 'home' };
             document.getElementById('view-categories').style.display = 'grid';
             document.getElementById('view-list').style.display = 'none';
             document.getElementById('view-checklist').style.display = 'none';
@@ -528,12 +463,14 @@
                     </div>
                 `;
             });
+            saveState();
         }
 
         function openCategory(catIndex, isBack = false) {
             if (!isBack) {
                 navigationHistory.push({ type: 'categories' });
             }
+            currentView = { view: 'list', catIndex: catIndex };
 
             const cat = database[catIndex];
             document.getElementById('view-categories').style.display = 'none';
@@ -558,6 +495,7 @@
                 });
                 container.innerHTML += html;
             });
+            saveState();
         }
 
         function loadChecklist(chkId, catIndex, isBack = false) {
@@ -581,6 +519,7 @@
             if (!isBack) {
                 navigationHistory.push({ type: 'category_list', catIndex: catIndex });
             }
+            currentView = { view: 'checklist', catIndex: catIndex, chkId: chkId };
 
             document.getElementById('view-list').style.display = 'none';
             document.getElementById('view-categories').style.display = 'none';
@@ -590,6 +529,7 @@
             document.getElementById('header-title').innerText = foundChk.name;
 
             renderChecklistRows();
+            saveState();
         }
 
         function goBack() {
@@ -621,6 +561,7 @@
                 row.className = `item-row ${item.checked ? 'checked' : ''}`;
                 row.onclick = () => {
                     item.checked = !item.checked;
+                    saveState();
                     renderChecklistRows();
                 };
                 row.innerHTML = `
@@ -636,6 +577,7 @@
         }
 
         function resetAllChecklists() {
+            if (!confirm("Réinitialiser toutes les checklists ?")) return;
             database.forEach(cat => {
                 cat.groups.forEach(group => {
                     group.checklists.forEach(chk => {
@@ -645,10 +587,23 @@
                     });
                 });
             });
-            alert("Toutes les checklists ont été réinitialisées.");
+            saveState();
         }
 
-        goHome();
+        // ============================================================
+        // DÉMARRAGE : restaure les coches et l'écran où tu étais
+        // ============================================================
+        const saved = loadState();
+        if (saved && saved.view === 'list' && database[saved.catIndex]) {
+            navigationHistory = [{ type: 'categories' }];
+            openCategory(saved.catIndex, true);
+        } else if (saved && saved.view === 'checklist' && database[saved.catIndex]) {
+            navigationHistory = [{ type: 'categories' }, { type: 'category_list', catIndex: saved.catIndex }];
+            loadChecklist(saved.chkId, saved.catIndex, true);
+            if (!currentActiveChecklist || currentView.view !== 'checklist') goHome();
+        } else {
+            goHome();
+        }
     </script>
 </body>
 </html>
