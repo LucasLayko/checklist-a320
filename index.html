@@ -7,90 +7,132 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Airbus A320 EFB - Normal & Emergency Procedures</title>
     <style>
+        :root {
+            --bg: #05080d; --panel: #0d131b; --panel2: #121a24; --line: #232e3b;
+            --text: #e8eef5; --muted: #7d8a99; --cyan: #00e5ff; --green: #2bff88;
+            --amber: #ffb000; --red: #ff4444;
+            --mono: "SF Mono", Menlo, Consolas, "Courier New", monospace;
+        }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            background-color: #0b0e14; color: #d0d7de;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
-            margin: 0; padding: 0; user-select: none; -webkit-user-select: none; overflow-x: hidden;
+            background: radial-gradient(ellipse at top, #0c1420 0%, var(--bg) 60%) fixed;
+            color: var(--text); font-family: var(--mono); margin: 0; padding: 0;
+            user-select: none; -webkit-user-select: none; overflow-x: hidden; min-height: 100vh;
         }
         header {
-            position: fixed; top: 0; left: 0; right: 0; height: 60px;
-            background-color: #161b22; padding: 0 20px;
+            position: fixed; top: 0; left: 0; right: 0; height: 64px;
+            background: linear-gradient(#141c27, #0d131b);
+            padding: env(safe-area-inset-top, 0) 20px 0; height: calc(64px + env(safe-area-inset-top, 0px));
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 2px solid #30363d; z-index: 1000;
+            border-bottom: 1px solid var(--line); box-shadow: 0 2px 14px rgba(0,0,0,.6); z-index: 1000;
         }
-        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
         .app-logo {
-            background: #00ffff; color: #000000; font-weight: 900; padding: 5px 10px;
-            border-radius: 4px; font-size: 13px; letter-spacing: 1px; font-family: monospace;
+            background: var(--cyan); color: #001318; font-weight: 900; padding: 6px 11px;
+            border-radius: 3px; font-size: 13px; letter-spacing: 2px;
+            box-shadow: 0 0 12px rgba(0,229,255,.35);
         }
         .header-title {
-            font-size: 16px; font-weight: 700; color: #8b949e; white-space: nowrap;
-            overflow: hidden; text-overflow: ellipsis; max-width: 50vw; font-family: monospace;
+            font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: 1px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45vw;
+            border-left: 1px solid var(--line); padding-left: 14px;
         }
-        .header-right { display: flex; gap: 10px; }
+        .header-right { display: flex; gap: 10px; align-items: center; }
+        .clock { font-size: 14px; color: var(--green); font-weight: 700; letter-spacing: 1px; margin-right: 6px; }
         .btn-efb {
-            background-color: #21262d; color: #58a6ff; border: 1px solid #30363d;
-            padding: 8px 16px; font-family: monospace; font-size: 13px; font-weight: bold;
-            border-radius: 6px; cursor: pointer;
+            background: var(--panel2); color: var(--cyan); border: 1px solid #2d3b4b;
+            padding: 9px 16px; font-family: var(--mono); font-size: 12px; font-weight: 700;
+            letter-spacing: 1px; border-radius: 4px; cursor: pointer;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
         }
-        .btn-efb:active { background-color: #30363d; }
-        .btn-reset-all { color: #f0883e; border-color: #f0883e; }
+        .btn-efb:active { background: #1c2836; transform: translateY(1px); }
+        .btn-reset-all { color: var(--amber); border-color: #5a4310; }
 
         .main-content {
-            margin-top: 80px; padding: 0 20px 40px 20px; max-width: 900px;
-            margin-left: auto; margin-right: auto;
+            margin: calc(84px + env(safe-area-inset-top, 0px)) auto 0; padding: 0 20px 40px;
+            max-width: 900px;
         }
-        .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
         .card-category {
-            background-color: #161b22; border: 1px solid #30363d; border-left: 5px solid #00ffff;
-            padding: 22px; border-radius: 8px; cursor: pointer;
+            background: linear-gradient(160deg, var(--panel2), var(--panel));
+            border: 1px solid var(--line); border-top: 3px solid var(--cyan);
+            padding: 30px 24px; border-radius: 6px; cursor: pointer; min-height: 130px;
+            box-shadow: 0 4px 18px rgba(0,0,0,.5);
         }
-        .card-category.emergency-cat { border-left-color: #ff4d4d; }
-        .card-category:active { background-color: #1c2128; }
-        .cat-tag { font-size: 11px; color: #8b949e; font-weight: bold; margin-bottom: 6px; font-family: monospace; }
-        .cat-title { font-size: 17px; font-weight: bold; color: #00ffff; font-family: monospace; }
-        .emergency-cat .cat-title { color: #ff4d4d; }
+        .card-category.emergency-cat { border-top-color: var(--red); }
+        .card-category:active { background: #182231; }
+        .cat-tag { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: 2px; margin-bottom: 10px; }
+        .cat-title { font-size: 19px; font-weight: 700; color: var(--cyan); letter-spacing: 1px; }
+        .emergency-cat .cat-title { color: var(--red); }
 
         .list-group-title {
-            color: #8b949e; font-size: 13px; font-weight: bold; margin: 24px 0 10px 0;
-            border-bottom: 1px solid #21262d; padding-bottom: 6px; font-family: monospace;
+            color: var(--amber); font-size: 12px; font-weight: 700; letter-spacing: 2px;
+            margin: 28px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line);
         }
         .card-checklist {
-            background-color: #161b22; border: 1px solid #30363d; padding: 18px 20px;
-            margin-bottom: 10px; border-radius: 8px; display: flex;
-            justify-content: space-between; align-items: center; cursor: pointer;
+            background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--cyan);
+            padding: 20px 22px; margin-bottom: 10px; border-radius: 4px;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
         }
-        .card-checklist:active { background-color: #21262d; }
-        .chk-title { font-size: 16px; font-weight: bold; color: #e6edf3; font-family: monospace; }
-        .chk-count { font-size: 12px; color: #8b949e; font-family: monospace; }
+        .card-checklist:active { background: var(--panel2); }
+        .card-checklist.done { border-left-color: var(--green); }
+        .card-checklist.done .chk-title { color: var(--green); }
+        .chk-title { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: .5px; }
+        .chk-count { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
 
-        .checklist-card { background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; overflow: hidden; }
+        .chk-head {
+            background: var(--panel2); border: 1px solid var(--line); border-bottom: none;
+            border-radius: 6px 6px 0 0; padding: 16px 20px 0;
+        }
+        .chk-head-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .chk-head-title { font-size: 15px; font-weight: 700; color: var(--cyan); letter-spacing: 1px; }
+        .chk-head-count { font-size: 13px; color: var(--muted); font-weight: 700; }
+        .progress { height: 4px; background: #1b2533; margin: 0 -20px; }
+        .progress-bar { height: 100%; background: var(--green); box-shadow: 0 0 8px var(--green); transition: width .25s; }
+        .chk-head.emergency-mode { border-top: 3px solid var(--red); }
+        .chk-head.emergency-mode .chk-head-title { color: var(--red); }
+        .chk-head.emergency-mode .progress-bar { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+
+        .checklist-card {
+            background: #070b11; border: 1px solid var(--line); border-radius: 0 0 6px 6px;
+            overflow: hidden; box-shadow: 0 4px 18px rgba(0,0,0,.5);
+        }
         .item-row {
             display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 12px;
-            padding: 16px 20px; border-bottom: 1px solid #21262d; cursor: pointer; background-color: #161b22;
+            padding: 17px 20px; border-bottom: 1px solid #141c26; cursor: pointer;
+            border-left: 4px solid transparent;
         }
         .item-row:last-child { border-bottom: none; }
-        .item-row:active { background-color: #1c2128; }
-        .challenge { color: #00ffff; font-size: 15px; font-weight: bold; font-family: monospace; white-space: nowrap; }
+        .item-row:active { background: #0e151f; }
+        .item-row.active {
+            background: rgba(0,229,255,.07); border-left-color: var(--cyan);
+            box-shadow: inset 0 0 0 1px rgba(0,229,255,.35);
+        }
+        .challenge { color: var(--text); font-size: 15px; font-weight: 700; white-space: nowrap; letter-spacing: .5px; }
         .dots-wrapper {
-            overflow: hidden; white-space: nowrap; color: #30363d; font-family: monospace;
-            font-size: 14px; letter-spacing: 2px;
+            overflow: hidden; white-space: nowrap; color: #2a3646; font-size: 14px; letter-spacing: 2px;
         }
-        .response {
-            color: #ffffff; font-size: 15px; font-weight: bold; font-family: monospace;
-            text-align: right; white-space: nowrap;
-        }
+        .response { color: var(--cyan); font-size: 15px; font-weight: 700; text-align: right; white-space: nowrap; }
         .checkbox-box {
-            width: 28px; height: 28px; border: 2px solid #484f58; border-radius: 4px;
-            display: flex; align-items: center; justify-content: center; font-size: 16px;
-            color: transparent; margin-left: 8px;
+            width: 28px; height: 28px; border: 2px solid #3a4757; border-radius: 3px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; color: transparent; margin-left: 8px;
         }
-        .item-row.checked .challenge, .item-row.checked .response { color: #00ff00 !important; }
+        .item-row.active .checkbox-box { border-color: var(--cyan); }
+        .item-row.checked .challenge, .item-row.checked .response { color: var(--green) !important; }
+        .item-row.checked .dots-wrapper { color: #164a2c; }
         .item-row.checked .checkbox-box {
-            border-color: #00ff00; background-color: rgba(0, 255, 0, 0.15); color: #00ff00;
+            border-color: var(--green); background: rgba(43,255,136,.14); color: var(--green);
         }
-        .emergency-mode .challenge { color: #ff4d4d; }
+        .emergency-mode .challenge { color: var(--amber); }
+        .emergency-mode .response { color: var(--text); }
+        .emergency-mode + .checklist-card .challenge { color: var(--amber); }
+        .emergency-mode + .checklist-card .response { color: var(--text); }
+        .emergency-mode + .checklist-card .item-row.active { background: rgba(255,176,0,.08); border-left-color: var(--amber); box-shadow: inset 0 0 0 1px rgba(255,176,0,.4); }
+        .complete-banner {
+            text-align: center; color: var(--green); font-weight: 700; letter-spacing: 3px;
+            font-size: 14px; padding: 20px; border-top: 1px solid #164a2c; background: rgba(43,255,136,.06);
+        }
     </style>
 </head>
 <body>
@@ -101,6 +143,7 @@
             <span id="header-title" class="header-title">A320 NORMAL & eQRH</span>
         </div>
         <div class="header-right">
+            <span id="clock" class="clock"></span>
             <button id="btn-back" class="btn-efb" onclick="goBack()" style="display:none;">&lt; BACK</button>
             <button id="btn-reset-all" class="btn-efb btn-reset-all" onclick="resetAllChecklists()">RESET ALL</button>
         </div>
@@ -487,9 +530,9 @@
                 let html = `<div class="list-group-title">${group.name}</div>`;
                 group.checklists.forEach(chk => {
                     html += `
-                        <div class="card-checklist" onclick="loadChecklist('${chk.id}', ${catIndex})">
+                        <div class="card-checklist ${chk.items.every(i => i.checked) ? 'done' : ''}" onclick="loadChecklist('${chk.id}', ${catIndex})">
                             <span class="chk-title">${chk.name}</span>
-                            <span class="chk-count">${chk.items.length} ITEMS</span>
+                            <span class="chk-count">${chk.items.filter(i => i.checked).length}/${chk.items.length} ITEMS</span>
                         </div>
                     `;
                 });
@@ -552,13 +595,26 @@
         function renderChecklistRows() {
             const container = document.getElementById('view-checklist');
             container.innerHTML = '';
+            const items = currentActiveChecklist.items;
+            const done = items.filter(i => i.checked).length;
+            const activeIdx = items.findIndex(i => !i.checked);
+
+            const head = document.createElement('div');
+            head.className = `chk-head ${isCurrentEmergency ? 'emergency-mode' : ''}`;
+            head.innerHTML = `
+                <div class="chk-head-top">
+                    <span class="chk-head-title">${currentActiveChecklist.name}</span>
+                    <span class="chk-head-count">${done}/${items.length}</span>
+                </div>
+                <div class="progress"><div class="progress-bar" style="width:${done / items.length * 100}%"></div></div>`;
+            container.appendChild(head);
 
             const card = document.createElement('div');
-            card.className = `checklist-card ${isCurrentEmergency ? 'emergency-mode' : ''}`;
+            card.className = 'checklist-card';
 
-            currentActiveChecklist.items.forEach((item) => {
+            items.forEach((item, idx) => {
                 const row = document.createElement('div');
-                row.className = `item-row ${item.checked ? 'checked' : ''}`;
+                row.className = `item-row ${item.checked ? 'checked' : ''} ${idx === activeIdx ? 'active' : ''}`;
                 row.onclick = () => {
                     item.checked = !item.checked;
                     saveState();
@@ -573,6 +629,12 @@
                 card.appendChild(row);
             });
 
+            if (done === items.length) {
+                const ok = document.createElement('div');
+                ok.className = 'complete-banner';
+                ok.innerText = 'CHECKLIST COMPLETE';
+                card.appendChild(ok);
+            }
             container.appendChild(card);
         }
 
@@ -589,6 +651,14 @@
             });
             saveState();
         }
+
+        function tickClock() {
+            const d = new Date();
+            const p = n => String(n).padStart(2, '0');
+            document.getElementById('clock').innerText = `${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())} UTC`;
+        }
+        tickClock();
+        setInterval(tickClock, 1000);
 
         // ============================================================
         // DÉMARRAGE : restaure les coches et l'écran où tu étais
